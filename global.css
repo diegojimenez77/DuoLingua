@@ -1,0 +1,92 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+@import "nativewind/theme";
+
+@theme {
+  /* ─── Font Families ─── */
+  --font-poppins: "Poppins-Regular";
+  --font-poppins-medium: "Poppins-Medium";
+  --font-poppins-semibold: "Poppins-SemiBold";
+  --font-poppins-bold: "Poppins-Bold";
+
+  /* ─── Primary Palette ─── */
+  --color-primary: #6c4ef5;
+  --color-primary-deep: #5b38f6;
+  --color-lingua-blue: #4d88ff;
+  --color-lingua-green: #21c16b;
+
+  /* ─── Semantic Palette ─── */
+  --color-success: #21c16b;
+  --color-warning: #ffc800;
+  --color-streak: #ff8a00;
+  --color-error: #ff4d4f;
+  --color-info: #4d88ff;
+
+  /* ─── Neutral Palette ─── */
+  --color-heading: #001328;
+  --color-body: #687280;
+  --color-separator: #e5e7eb;
+  --color-surface: #f6f7fb;
+  --color-canvas: #ffffff;
+}
+
+@layer utilities {
+  /* ─── Typography Scale ─────────────────────────────────── */
+
+  /* H1 — Page / Screen Title */
+  .type-h1 {
+    font-size: 32px;
+    line-height: 38px;
+    font-family: "Poppins-Bold";
+  }
+
+  /* H2 — Section Title */
+  .type-h2 {
+    font-size: 24px;
+    line-height: 31px;
+    font-family: "Poppins-SemiBold";
+  }
+
+  /* H3 — Card / Module Title */
+  .type-h3 {
+    font-size: 20px;
+    line-height: 26px;
+    font-family: "Poppins-SemiBold";
+  }
+
+  /* H4 — Subheading */
+  .type-h4 {
+    font-size: 16px;
+    line-height: 22px;
+    font-family: "Poppins-Medium";
+  }
+
+  /* Body Large — Important content */
+  .type-body-lg {
+    font-size: 16px;
+    line-height: 26px;
+    font-family: "Poppins-Regular";
+  }
+
+  /* Body Medium — Body text */
+  .type-body-md {
+    font-size: 14px;
+    line-height: 22px;
+    font-family: "Poppins-Regular";
+  }
+
+  /* Body Small — Supporting text */
+  .type-body-sm {
+    font-size: 13px;
+    line-height: 21px;
+    font-family: "Poppins-Regular";
+  }
+
+  /* Caption — Labels / meta text */
+  .type-caption {
+    font-size: 11px;
+    line-height: 15px;
+    font-family: "Poppins-Regular";
+  }
+}

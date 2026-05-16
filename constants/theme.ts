@@ -1,53 +1,43 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+// Design tokens — mirrors global.css @theme variables.
+// Use these in StyleSheet.create() and inline styles for exception components.
 
-import { Platform } from 'react-native';
+export const colors = {
+  // Primary
+  primary: "#6C4EF5",
+  primaryDeep: "#5B38F6",
+  linguaBlue: "#4D88FF",
+  linguaGreen: "#21C16B",
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+  // Semantic
+  success: "#21C16B",
+  warning: "#FFC800",
+  streak: "#FF8A00",
+  error: "#FF4D4F",
+  info: "#4D88FF",
 
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
-};
+  // Neutrals
+  heading: "#001328",
+  body: "#687280",
+  separator: "#E5E7EB",
+  surface: "#F6F7FB",
+  canvas: "#FFFFFF",
+} as const;
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+export const fonts = {
+  regular: "Poppins-Regular",
+  medium: "Poppins-Medium",
+  semiBold: "Poppins-SemiBold",
+  bold: "Poppins-Bold",
+} as const;
+
+// Typography scale — computed line-heights match the design spec (px × ratio).
+export const typography = {
+  h1: { fontSize: 32, fontFamily: fonts.bold, lineHeight: 38 },
+  h2: { fontSize: 24, fontFamily: fonts.semiBold, lineHeight: 31 },
+  h3: { fontSize: 20, fontFamily: fonts.semiBold, lineHeight: 26 },
+  h4: { fontSize: 16, fontFamily: fonts.medium, lineHeight: 22 },
+  bodyLarge: { fontSize: 16, fontFamily: fonts.regular, lineHeight: 26 },
+  bodyMedium: { fontSize: 14, fontFamily: fonts.regular, lineHeight: 22 },
+  bodySmall: { fontSize: 13, fontFamily: fonts.regular, lineHeight: 21 },
+  caption: { fontSize: 11, fontFamily: fonts.regular, lineHeight: 15 },
+} as const;
