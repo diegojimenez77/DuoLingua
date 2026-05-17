@@ -1,7 +1,7 @@
 import { colors, fonts } from "@/constants/theme";
-import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -16,30 +16,54 @@ interface Props {
   visible: boolean;
   email: string;
   onClose: () => void;
+  onVerify: (code: string) => Promise<void>;
 }
 
-export default function VerificationModal({ visible, email, onClose }: Props) {
+export default function VerificationModal({
+  visible,
+  email,
+  onClose,
+  onVerify,
+}: Props) {
   const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (visible) {
       setCode("");
+      setError("");
       const t = setTimeout(() => inputRef.current?.focus(), 350);
       return () => clearTimeout(t);
     }
   }, [visible]);
 
   useEffect(() => {
-    if (code.length === 6) {
-      setTimeout(() => {
-        onClose();
-        router.replace("/");
-      }, 200);
+    if (code.length === 6 && !loading) {
+      verify(code);
     }
   }, [code]);
 
+  const verify = async (enteredCode: string) => {
+    setLoading(true);
+    setError("");
+    try {
+      await onVerify(enteredCode);
+    } catch (err: any) {
+      const message =
+        err?.errors?.[0]?.message ||
+        err?.message ||
+        "Invalid code. Please try again.";
+      setError(message);
+      setCode("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChange = (text: string) => {
+    if (loading) return;
     const cleaned = text.replace(/[^0-9]/g, "").slice(0, 6);
     setCode(cleaned);
   };
@@ -52,7 +76,6 @@ export default function VerificationModal({ visible, email, onClose }: Props) {
       statusBarTranslucent
     >
       <View style={styles.container}>
-        {/* Backdrop tap closes modal */}
         <TouchableOpacity
           style={StyleSheet.absoluteFill}
           activeOpacity={1}
@@ -63,7 +86,6 @@ export default function VerificationModal({ visible, email, onClose }: Props) {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardView}
         >
-          {/* Sheet — inner TouchableOpacity blocks backdrop from firing */}
           <TouchableOpacity activeOpacity={1} style={styles.sheet}>
             <View style={styles.handle} />
 
@@ -96,9 +118,18 @@ export default function VerificationModal({ visible, email, onClose }: Props) {
                 ))}
             </TouchableOpacity>
 
-            <Text style={styles.hint}>Tap the boxes above to enter code</Text>
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                color={colors.primary}
+                style={styles.indicator}
+              />
+            ) : error ? (
+              <Text style={styles.errorText}>{error}</Text>
+            ) : (
+              <Text style={styles.hint}>Tap the boxes above to enter code</Text>
+            )}
 
-            {/* Hidden input that drives the digit boxes */}
             <TextInput
               ref={inputRef}
               value={code}
@@ -192,6 +223,16 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: 12,
     color: colors.body,
+    marginBottom: 8,
+  },
+  errorText: {
+    fontFamily: fonts.regular,
+    fontSize: 12,
+    color: colors.error,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  indicator: {
     marginBottom: 8,
   },
   hiddenInput: {

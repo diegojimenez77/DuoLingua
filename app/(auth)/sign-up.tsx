@@ -1,10 +1,13 @@
 import VerificationModal from "@/components/VerificationModal";
 import { images } from "@/constants/images";
 import { colors, fonts } from "@/constants/theme";
+import { useSignUp, useSSO } from "@clerk/expo";
 import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
+import { makeRedirectUri } from "expo-auth-session";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -18,10 +21,78 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpScreen() {
+  const { signUp } = useSignUp();
+  const { startSSOFlow } = useSSO();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSignUp = async () => {
+    if (loading) return;
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Missing Fields", "Please enter your email and password.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error: signUpError } = await signUp.password({
+        emailAddress: email.trim(),
+        password,
+      });
+      if (signUpError) {
+        Alert.alert("Sign Up Error", signUpError.message);
+        return;
+      }
+      const { error: codeError } = await signUp.verifications.sendEmailCode();
+      if (codeError) {
+        Alert.alert("Verification Error", codeError.message);
+        return;
+      }
+      setModalVisible(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (code: string) => {
+    const { error } = await signUp.verifications.verifyEmailCode({ code });
+    if (error) throw new Error(error.message);
+    await signUp.finalize({ navigate: () => router.replace("/") });
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      const { createdSessionId, setActive, authSessionResult } = await startSSOFlow({
+        strategy: "oauth_google",
+        redirectUrl: makeRedirectUri(),
+      });
+
+      // User closed/cancelled the browser — do nothing
+      if (authSessionResult?.type === "cancel" || authSessionResult?.type === "dismiss") return;
+
+      if (createdSessionId && setActive) {
+        await setActive({ session: createdSessionId });
+        router.replace("/");
+      }
+    } catch (err: any) {
+      if (err?.status === 429) {
+        const seconds = err?.retryAfter ?? 60;
+        Alert.alert(
+          "Too Many Attempts",
+          `Too many requests. Please wait ${seconds} seconds and try again.`
+        );
+        return;
+      }
+      const message =
+        err?.errors?.[0]?.longMessage ||
+        err?.errors?.[0]?.message ||
+        err?.message ||
+        "Something went wrong.";
+      Alert.alert("Google Sign Up Error", message);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -99,11 +170,14 @@ export default function SignUpScreen() {
 
           {/* Sign Up */}
           <TouchableOpacity
-            style={styles.primaryBtn}
-            onPress={() => setModalVisible(true)}
+            style={[styles.primaryBtn, loading && styles.primaryBtnDisabled]}
+            onPress={handleSignUp}
             activeOpacity={0.85}
+            disabled={loading}
           >
-            <Text style={styles.primaryBtnText}>Sign Up</Text>
+            <Text style={styles.primaryBtnText}>
+              {loading ? "Creating account…" : "Sign Up"}
+            </Text>
           </TouchableOpacity>
 
           {/* Divider */}
@@ -114,7 +188,7 @@ export default function SignUpScreen() {
           </View>
 
           {/* Social buttons */}
-          <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8} onPress={handleGoogleSignUp}>
             <AntDesign name="google" size={20} color="#DB4437" />
             <Text style={styles.socialText}>Continue with Google</Text>
           </TouchableOpacity>
@@ -125,7 +199,7 @@ export default function SignUpScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8}>
-            <AntDesign name="apple1" size={22} color="#000" />
+            <Ionicons name="logo-apple" size={22} color="#000" />
             <Text style={styles.socialText}>Continue with Apple</Text>
           </TouchableOpacity>
 
@@ -143,6 +217,7 @@ export default function SignUpScreen() {
         visible={modalVisible}
         email={email}
         onClose={() => setModalVisible(false)}
+        onVerify={handleVerify}
       />
     </SafeAreaView>
   );
@@ -229,6 +304,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 4,
     marginBottom: 20,
+  },
+  primaryBtnDisabled: {
+    opacity: 0.65,
   },
   primaryBtnText: {
     fontFamily: fonts.semiBold,
