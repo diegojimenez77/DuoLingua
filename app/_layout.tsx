@@ -2,6 +2,7 @@ import "../global.css";
 
 import { ClerkProvider } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
+import { hydrateLanguageStore } from "@/store/languageStore";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -26,6 +27,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded) {
+      hydrateLanguageStore();
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);

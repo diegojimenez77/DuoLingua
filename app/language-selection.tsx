@@ -1,6 +1,7 @@
 import { images } from "@/constants/images";
 import { colors, fonts } from "@/constants/theme";
 import { languages } from "@/data/languages";
+import { useLanguageStore } from "@/store/languageStore";
 import type { Language } from "@/types/learning";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -23,10 +24,12 @@ const DIFFICULTY_COLORS: Record<Language["difficulty"], string> = {
 
 export default function LanguageSelectionScreen() {
   const [selected, setSelected] = useState<string | null>(null);
+  const { setSelectedLanguage } = useLanguageStore();
 
   function handleConfirm() {
     if (!selected) return;
-    // Navigate to home (tabs) once language is chosen
+    const lang = languages.find((l) => l.code === selected);
+    if (lang) setSelectedLanguage(lang);
     router.replace("/");
   }
 
