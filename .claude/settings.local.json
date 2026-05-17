@@ -4,7 +4,9 @@
       "Bash(npm install *)",
       "Bash(npm view *)",
       "Bash(node -e \"const { withNativewind } = require\\('nativewind/metro'\\); console.log\\('NativeWind metro OK'\\);\")",
-      "Bash(node -e \"const { getDefaultConfig } = require\\('c:/Users/diego/Documents/JSMastery/node_modules/expo/metro-config'\\); console.log\\('metro config OK'\\);\")"
+      "Bash(node -e \"const { getDefaultConfig } = require\\('c:/Users/diego/Documents/JSMastery/node_modules/expo/metro-config'\\); console.log\\('metro config OK'\\);\")",
+      "Bash(npx expo *)",
+      "Bash(node -e \"const c = require\\('@clerk/expo'\\); console.log\\(Object.keys\\(c\\)\\)\")"
     ]
   }
 }
